@@ -4,19 +4,24 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.github.pagehelper.PageInfo;
 import com.houyuli.cms.domain.Article;
 import com.houyuli.cms.domain.Category;
 import com.houyuli.cms.domain.Channel;
+import com.houyuli.cms.domain.Comments;
 import com.houyuli.cms.domain.Slide;
+import com.houyuli.cms.domain.User;
 import com.houyuli.cms.service.ArticleService;
 import com.houyuli.cms.service.ChannelService;
+import com.houyuli.cms.service.CommentsService;
 import com.houyuli.cms.service.SlideService;
 import com.houyuli.common.utils.DateUtil;
 
@@ -29,6 +34,8 @@ public class IndexController {
 	private ArticleService articleService;
 	@Resource
 	private SlideService slideService;
+	@Resource
+	private CommentsService commentsService;
 
 	@RequestMapping(value = { "", "/", "index" })
 	public String index(Model model, @RequestParam(defaultValue = "1") Integer pageNum,
@@ -78,9 +85,25 @@ public class IndexController {
 	 * @return: String
 	 */
 	@RequestMapping("detail")
-	public String detail(Model model, Integer id) {
+	public String detail(Model model, Integer id,@RequestParam(defaultValue = "1") Integer pageNum,
+			@RequestParam(defaultValue = "5") Integer pageSize) {
 		Article article = articleService.selectArticle(id);
 		model.addAttribute("article", article);
+		PageInfo<Comments> info = commentsService.selectCommentsByArticleId(id, pageNum, pageSize);
+		model.addAttribute("info", info);
+		PageInfo<Article> info2 = commentsService.selectCommentsByOrder(1, 10);
+		model.addAttribute("info2", info2);
 		return "index/article";
 	}
+	
+	@RequestMapping("addComments")
+	@ResponseBody
+	public boolean addComments(Comments comments,HttpSession session) {
+		User user = (User) session.getAttribute("user");
+		comments.setUserId(user.getId());
+		comments.setCreated(new Date());
+		commentsService.updateArticleComments(comments.getArticleId());
+		return commentsService.insertComments(comments) > 0;
+	}
+
 }

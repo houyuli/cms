@@ -6,18 +6,21 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.github.pagehelper.PageInfo;
 import com.houyuli.cms.domain.Article;
 import com.houyuli.cms.domain.Category;
 import com.houyuli.cms.domain.Channel;
+import com.houyuli.cms.domain.User;
 import com.houyuli.cms.service.ArticleService;
 import com.houyuli.cms.service.ChannelService;
 import com.houyuli.common.utils.RandomUtil;
@@ -137,7 +140,7 @@ public class MyController {
 	 */
 	@RequestMapping("publish")
 	@ResponseBody
-	public boolean publish(Article article, MultipartFile file) {
+	public boolean publish(Article article, MultipartFile file,HttpSession session) {
 		// 文件上传
 		if (null != file && !file.isEmpty()) {
 			// 文件上传的路径
@@ -160,7 +163,8 @@ public class MyController {
 			}
 		}
 		// 文章默认值
-		article.setUserId(1);
+		User user = (User) session.getAttribute("user");
+		article.setUserId(user.getId());
 		article.setCreated(new Date());
 		System.out.println("++++++++++++++++" + article);
 		return articleService.insertArticle(article) > 0;

@@ -28,8 +28,18 @@ public class Article implements Serializable {
 	private User user;// 封装对象
 	private Channel channel;// 封装对象
 	private Category category;// 封装对象
-	private String displayDate;//个性化时间
-	
+	private String displayDate;// 个性化时间
+
+	private Integer comments;// 评论条数
+
+	public Integer getComments() {
+		return comments;
+	}
+
+	public void setComments(Integer comments) {
+		this.comments = comments;
+	}
+
 	public String getDisplayDate() {
 		return displayDate;
 	}

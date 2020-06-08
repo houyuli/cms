@@ -18,6 +18,24 @@ public class Comments implements Serializable {
 	private Date created;
 
 	private User user;
+	private Article article;
+	private String displayTime;// 个性化时间
+
+	public String getDisplayTime() {
+		return displayTime;
+	}
+
+	public void setDisplayTime(String displayTime) {
+		this.displayTime = displayTime;
+	}
+
+	public Article getArticle() {
+		return article;
+	}
+
+	public void setArticle(Article article) {
+		this.article = article;
+	}
 
 	public Integer getId() {
 		return id;
